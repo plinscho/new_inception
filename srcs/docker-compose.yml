@@ -1,0 +1,44 @@
+services:
+  nginx:
+    container_name: nginx
+    build: ./req/nginx/
+    depends_on:
+      - mariadb
+    ports:
+      - "443:443"
+    env_file: ".env"
+    networks:
+      - inception
+    restart: on-failure
+  
+  mariadb:
+    container_name: mariadb
+    build: ./req/mariadb
+    env_file:
+      - .env
+    volumes:
+      - ./req/data/mariadb:/var/lib/mysql
+    networks:
+      - inception
+    restart: on-failure
+
+  wp:
+    container_name: wp
+    build: ./req/wp
+    depends_on:
+      - mariadb
+    env_file:
+      - .env
+    volumes:
+      - ./req/data/wp:/var/www/html
+    networks:
+      - inception
+
+volumes:
+  mariadb_vol:
+
+networks:
+  inception:
+    name: inception
+    driver: bridge
+
